@@ -3,4 +3,7 @@
 @tailwind utilities;
 
 @layer components {
+  .chart {
+    @apply p-4;
+  }
 }

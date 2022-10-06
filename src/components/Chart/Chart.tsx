@@ -10,20 +10,93 @@ type Props = {};
 const Charts: React.FC<Props> = props => {
   const ctx = useContext(ChartContext);
 
-  const xLabels = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sept',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  // data processing function for reducing the transaction amounts down to a sum
+  const sumTransaction = (data: Chart[], month: number) => {
+    // Filtering for 'credit' transactionType
+    const credit: Chart[] | undefined = data.filter(
+      item => item.transactionType === 'credit'
+    );
+
+    // Filtering for 'debit' transactionType
+    const debit: Chart[] | undefined = data.filter(
+      item => item.transactionType === 'debit'
+    );
+
+    // Filtering for a particular 'month' credit transactions across all years
+    const credit_for_monthX = credit?.filter(
+      item => new Date(item.date).getMonth() === month
+    );
+
+    // Filtering for a particular 'month' debit transactions across all years
+    const debit_for_monthX = debit?.filter(
+      item => new Date(item.date).getMonth() === month
+    );
+
+    // creating a reduce callback function to be used in Array.reduce()
+    const reduceFunction = (total: number, value: number) => total + value;
+
+    // function for calculating credit for the days of the month
+    const calcDay_credit = () => {
+      const data: number[] = []; // will contain reduced transaction value for each day
+
+      for (let i = 0; i <= 6; i++) {
+        // Filtering for a particular 'day of week' credit transactions across all years
+        const credit_for_dayX = credit_for_monthX?.filter(
+          item => new Date(item.date).getDay() === i
+        );
+
+        const dayXCreditSum: number = credit_for_dayX
+          ?.map(item => item.amount)
+          .reduce(reduceFunction, 0) as number; // type assertion
+
+        data.push(Math.round(dayXCreditSum));
+      }
+
+      return data;
+    };
+
+    // function for calculating debit for the days of the month
+    const calcDay_debit = () => {
+      const data: number[] = []; // will contain reduced transaction value for each day
+
+      for (let i = 0; i <= 6; i++) {
+        // Filtering for a particular 'day of week' debit transactions across all years
+        const debit_for_dayX = debit_for_monthX?.filter(
+          item => new Date(item.date).getDay() === i
+        );
+
+        const dayXDebitSum: number = debit_for_dayX
+          ?.map(item => item.amount)
+          .reduce(reduceFunction, 0) as number; // type assertion
+
+        data.push(Math.round(dayXDebitSum));
+      }
+
+      return data;
+    };
+
+    const creditValues = calcDay_credit(); // [sun, mon, tue, wed, thu, fri, sat]
+    const debitValues = calcDay_debit(); // [sun, mon, tue, wed, thu, fri, sat]
+
+    // prettier-ignore
+    const daysNetValue = creditValues.map((value, index) => value + debitValues[index]);
+
+    return daysNetValue; // array of net value of each day in the month
+  };
+
+  const transactions: Array<number[]> = [];
+
+  for (let i = 0; i <= 11; i++) {
+    const value = sumTransaction(ctx?.charts as Chart[], i);
+
+    transactions.push(value);
+  }
+
+  console.log(transactions);
+  console.table(transactions);
+
+  // prettier-ignore
+  const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
   const yLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const data = new Array(yLabels.length)
@@ -34,54 +107,40 @@ const Charts: React.FC<Props> = props => {
         .map(() => Math.floor(Math.random() * 100))
     );
 
-  const credit: Chart[] | undefined = ctx?.charts.filter(
-    item => item.transactionType === 'credit'
-  );
+  // convert array to matrix
+  const listToMatrix = (list: any, elementsPerSubArray: number) => {
+    // prettier-ignore
+    let matrix:any = [], i: number, k: number;
 
-  const debit: Chart[] | undefined = ctx?.charts.filter(
-    item => item.transactionType === 'debit'
-  );
+    for (i = 0, k = -1; i < list.length; i++) {
+      if (i % elementsPerSubArray === 0) {
+        k++;
+        matrix[k] = [];
+      }
 
-  // prettier-ignore
-  const sundayCredit = credit?.filter(item => new Date(item.date).getDay() === 0);
+      matrix[k].push(list[i]);
+    }
 
-  const sundayDebit = debit?.filter(item => new Date(item.date).getDay() === 0);
+    return matrix;
+  };
 
-  console.log(sundayCredit);
-  console.log(sundayDebit);
+  const transformedData = listToMatrix(transactions, 7);
 
-  const reduceFunction = (total: number, value: number) => total + value;
-
-  const sundayCreditSum: number | undefined = sundayCredit
-    ?.map(item => item.amount)
-    .reduce(reduceFunction);
-
-  const sundayDebitSum: number | undefined = sundayDebit
-    ?.map(item => item.amount)
-    .reduce(reduceFunction);
-
-  console.log(sundayCreditSum, sundayDebitSum);
-
-  // const sundayTotalSum: number | undefined = sundayCreditSum + sundayDebititSum;
-
-  // const col: [] = [];
-
-  // const row: [] = [];
-
-  // const carterdata: Array<[]> = [col, row];
+  console.log(transformedData);
 
   return (
     <>
-      <motion.div>
+      <motion.div className="chart app__flex">
         <HeatMap
           xLabels={xLabels}
           yLabels={yLabels}
           xLabelsLocation={'bottom'}
-          xLabelWidth={60}
+          xLabelWidth={900}
           data={data}
           squares
-          height={45}
+          height={65}
           onClick={(x: any, y: any) => alert(`Clicked ${x}, ${y}`)}
+          unit="Naira"
           cellStyle={(
             background: any,
             value: number,
@@ -91,9 +150,9 @@ const Charts: React.FC<Props> = props => {
             x: any,
             y: any
           ) => ({
-            background: `rgb(0, 151, 230, ${1 - (max - value) / (max - min)})`,
-            fontSize: '11.5px',
-            color: '#444',
+            background: `rgb(0, 128, 128, ${1 - (max - value) / (max - min)})`,
+            fontSize: '1rem',
+            color: '#fff',
           })}
           cellRender={(
             value:

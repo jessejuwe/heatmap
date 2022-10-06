@@ -7,7 +7,7 @@ interface ChartContextObj {
 }
 
 export const ChartContext = React.createContext<ChartContextObj | null>({
-  charts: []
+  charts: [],
 });
 
 type Props = { children: React.ReactNode };
@@ -20,7 +20,7 @@ const ContextProvider: React.FC<Props> = props => {
     const data: Array<Chart> = customData.map(data => ({
       transactionType: data.transactionType,
       date: data.date,
-      amount: data.amount
+      amount: data.amount,
     }));
 
     setCharts(data);
@@ -28,10 +28,8 @@ const ContextProvider: React.FC<Props> = props => {
     return () => {};
   }, []);
 
-  console.log(charts);
-
   const contextValue: ChartContextObj = {
-    charts
+    charts,
   };
 
   return (
