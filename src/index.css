@@ -1,13 +1,38 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@import url("https://fonts.googleapis.com/css2?family=Mouse+Memoirs&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu+Mono&family=Ubuntu:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Catamaran&family=Oswald&family=Roboto&family=Square+Peg&display=swap");
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@import "./App.css";
+@import "./components/Cell/Cell.scss";
+@import "./components/Chart/Chart.scss";
+@import "./components/Row/Row.scss";
+@import "./components/Timeline/Timeline.scss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-sky: 14 165 233;
+    --color-purple: 168 85 247;
+    --color-pink: 236 72 153;
+    --color-emerald: 20 184 166;
+    --color-orange: 249 115 22;
+    --color-darkBlue: 28 34 55;
+    --color-darkPink: 240 9 70;
+  }
+
+  html,
+  body {
+    @apply p-0 m-0;
+  }
+
+  a {
+    @apply no-underline;
+  }
+
+  * {
+    @apply box-border scroll-smooth;
+  }
 }
