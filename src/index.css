@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Catamaran&family=Oswald&family=Roboto&family=Square+Peg&display=swap');
 
 @import './App.css';
-@import './components/Chart/Chart.scss';
+@import './components/Charts/Charts.scss';
 
 @tailwind base;
 @tailwind components;

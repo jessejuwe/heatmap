@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Chart from '../model/chart';
+import Chart from '../model/model';
 import customData from '../data/transactions.json'; // importing the .json file
 
 interface ChartContextObj {

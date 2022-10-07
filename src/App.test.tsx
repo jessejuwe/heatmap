@@ -2,8 +2,17 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+// Testing Suite
+describe('<App />', () => {
+  // Test
+  test('renders HeatMap Chart', () => {
+    // Arrange
+    render(<App />);
+
+    // Act
+
+    // Assert
+    const linkElement = screen.getByText(/HeatMap Chart/i, { exact: true });
+    expect(linkElement).toBeInTheDocument();
+  });
 });

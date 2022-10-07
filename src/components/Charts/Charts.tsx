@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
 import HeatMap from 'react-heatmap-grid';
 
-import Chart from '../../model/chart';
+import Chart from '../../model/model';
 import { ChartContext } from '../../context/chart-context';
 
 type Props = {};
@@ -45,11 +45,12 @@ const Charts: React.FC<Props> = props => {
           item => new Date(item.date).getDay() === i
         );
 
+        // mapping thru the days of the week, and reducing the values to one
         const dayXCreditSum: number = credit_for_dayX
           ?.map(item => item.amount)
           .reduce(reduceFunction, 0) as number; // type assertion
 
-        data.push(Math.round(dayXCreditSum));
+        data.push(Math.round(dayXCreditSum)); // adding each reduced value to an array
       }
 
       return data;
@@ -59,17 +60,19 @@ const Charts: React.FC<Props> = props => {
     const calcDay_debit = () => {
       const data: number[] = []; // will contain reduced transaction value for each day
 
+      // iterates 7 times (representing each day in a week)
       for (let i = 0; i <= 6; i++) {
         // Filtering for a particular 'day of week' debit transactions across all years
         const debit_for_dayX = debit_for_monthX?.filter(
           item => new Date(item.date).getDay() === i
         );
 
+        // mapping thru the days of the week, and reducing the values to one
         const dayXDebitSum: number = debit_for_dayX
           ?.map(item => item.amount)
           .reduce(reduceFunction, 0) as number; // type assertion
 
-        data.push(Math.round(dayXDebitSum));
+        data.push(Math.round(dayXDebitSum)); // adding each reduced value for each day, to an array
       }
 
       return data;
@@ -84,49 +87,23 @@ const Charts: React.FC<Props> = props => {
     return daysNetValue; // array of net value of each day in the month
   };
 
-  const transactions: Array<number[]> = [];
+  const transactions: Array<number[]> = []; // shape of the output
 
+  // iterates 12 times (representing each month in a year)
   for (let i = 0; i <= 11; i++) {
     const value = sumTransaction(ctx?.charts as Chart[], i);
 
-    transactions.push(value);
+    transactions.push(value); // adding each reduced value for each month, to an array
   }
 
-  console.log(transactions);
-  console.table(transactions);
+  // transposing the array (changing the shape of the array)
+  const transposedData = transactions[0].map((_, colIndex) =>
+    transactions.map(row => row[colIndex])
+  );
 
   // prettier-ignore
   const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
   const yLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  const data = new Array(yLabels.length)
-    .fill(0)
-    .map(() =>
-      new Array(xLabels.length)
-        .fill(0)
-        .map(() => Math.floor(Math.random() * 100))
-    );
-
-  // convert array to matrix
-  const listToMatrix = (list: any, elementsPerSubArray: number) => {
-    // prettier-ignore
-    let matrix:any = [], i: number, k: number;
-
-    for (i = 0, k = -1; i < list.length; i++) {
-      if (i % elementsPerSubArray === 0) {
-        k++;
-        matrix[k] = [];
-      }
-
-      matrix[k].push(list[i]);
-    }
-
-    return matrix;
-  };
-
-  const transformedData = listToMatrix(transactions, 7);
-
-  console.log(transformedData);
 
   return (
     <>
@@ -136,11 +113,11 @@ const Charts: React.FC<Props> = props => {
           yLabels={yLabels}
           xLabelsLocation={'bottom'}
           xLabelWidth={900}
-          data={data}
+          data={transposedData}
           squares
           height={65}
           onClick={(x: any, y: any) => alert(`Clicked ${x}, ${y}`)}
-          unit="Naira"
+          unit="Dollars"
           cellStyle={(
             background: any,
             value: number,
@@ -154,20 +131,7 @@ const Charts: React.FC<Props> = props => {
             fontSize: '1rem',
             color: '#fff',
           })}
-          cellRender={(
-            value:
-              | string
-              | number
-              | boolean
-              | React.ReactElement<
-                  any,
-                  string | React.JSXElementConstructor<any>
-                >
-              | React.ReactFragment
-              | React.ReactPortal
-              | null
-              | undefined
-          ) => value && <div>{value}</div>}
+          cellRender={(value: any) => value && <div>{value}</div>}
         />
       </motion.div>
     </>
