@@ -4,6 +4,22 @@
 
 @layer components {
   .chart {
-    @apply p-4;
+    @apply p-4 flex-col;
+  }
+
+  p {
+    @apply p-2 text-white;
+  }
+
+  .red-text span {
+    @apply text-[#ff0000];
+  }
+
+  .green-text span {
+    @apply text-[#00ff00];
+  }
+
+  .chart div > div > div {
+    @apply text-white;
   }
 }

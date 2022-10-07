@@ -14,4 +14,8 @@
   .head-text {
     @apply font-semibold text-2xl text-gray-200 font-catamaran;
   }
+
+  .p-text {
+    @apply font-semibold text-lg text-gray-200 font-catamaran;
+  }
 }

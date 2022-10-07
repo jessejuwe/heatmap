@@ -107,7 +107,16 @@ const Charts: React.FC<Props> = props => {
 
   return (
     <>
-      <motion.div className="chart app__flex">
+      <motion.div
+        className="chart app__flex"
+        whileInView={{ y: [-100, 0], opacity: [0, 1] }}
+        exit={{ x: [0, 20], opacity: [1, 0] }}
+        transition={{
+          duration: 1,
+          ease: 'easeInOut',
+          delayChildren: 0.5,
+        }}
+      >
         <HeatMap
           xLabels={xLabels}
           yLabels={yLabels}
@@ -118,21 +127,25 @@ const Charts: React.FC<Props> = props => {
           height={65}
           onClick={(x: any, y: any) => alert(`Clicked ${x}, ${y}`)}
           unit="Dollars"
-          cellStyle={(
-            background: any,
-            value: number,
-            min: number,
-            max: number,
-            data: any,
-            x: any,
-            y: any
-          ) => ({
-            background: `rgb(0, 128, 128, ${1 - (max - value) / (max - min)})`,
+          // prettier-ignore
+          cellStyle={(background: any, value: number, min: number, max: number) => ({
+            background:
+              value > max - value
+                ? `rgb(0, 255, 0, ${1 - (max - value) / (max - min)})`
+                : `rgb(255, 0, 0, ${(max - value) / (max - min)})`,
             fontSize: '1rem',
             color: '#fff',
           })}
           cellRender={(value: any) => value && <div>{value}</div>}
         />
+        <p className="p-text red-text">
+          The <span>redder</span> the cell, the higher the <span>negative</span>{' '}
+          accumulated transaction
+        </p>
+        <p className="p-text green-text">
+          The <span>greener</span> the cell, the higher the{' '}
+          <span>positive</span> accumulated transaction
+        </p>
       </motion.div>
     </>
   );
